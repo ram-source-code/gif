@@ -23,9 +23,13 @@ namespace GifWp
 <Border xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         Background='$BG' TextElement.Foreground='$FG' TextElement.FontSize='13'>
  <Border.Resources>
+  <!-- Keyboard focus ring (shown only when navigating with the keyboard). -->
+  <Style x:Key='Focus'><Setter Property='Control.Template'><Setter.Value><ControlTemplate>
+   <Border Margin='-3' CornerRadius='8' BorderThickness='2' BorderBrush='$FG' SnapsToDevicePixels='True'/>
+  </ControlTemplate></Setter.Value></Setter></Style>
   <Style TargetType='Button'>
    <Setter Property='Background' Value='$BTN'/><Setter Property='BorderBrush' Value='$LINE'/><Setter Property='Foreground' Value='$FG'/>
-   <Setter Property='Padding' Value='14,6'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{x:Null}'/>
+   <Setter Property='Padding' Value='14,6'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{StaticResource Focus}'/>
    <Setter Property='Template'><Setter.Value><ControlTemplate TargetType='Button'>
     <Border x:Name='b' Background='{TemplateBinding Background}' BorderBrush='{TemplateBinding BorderBrush}' BorderThickness='1' CornerRadius='6' Padding='{TemplateBinding Padding}'>
      <ContentPresenter HorizontalAlignment='Center' VerticalAlignment='Center'/></Border>
@@ -40,12 +44,12 @@ namespace GifWp
    <Setter Property='Foreground' Value='$ONACCENT'/><Setter Property='FontWeight' Value='SemiBold'/>
   </Style>
   <Style x:Key='Link' TargetType='Button'>
-   <Setter Property='Foreground' Value='$MUTED'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{x:Null}'/>
+   <Setter Property='Foreground' Value='$MUTED'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{StaticResource Focus}'/>
    <Setter Property='Template'><Setter.Value><ControlTemplate TargetType='Button'><ContentPresenter/></ControlTemplate></Setter.Value></Setter>
    <Style.Triggers><Trigger Property='IsMouseOver' Value='True'><Setter Property='Foreground' Value='$FG'/></Trigger></Style.Triggers>
   </Style>
   <Style x:Key='Seg' TargetType='RadioButton'>
-   <Setter Property='Foreground' Value='$MUTED'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{x:Null}'/>
+   <Setter Property='Foreground' Value='$MUTED'/><Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{StaticResource Focus}'/>
    <Setter Property='Template'><Setter.Value><ControlTemplate TargetType='RadioButton'>
     <Border x:Name='b' Background='Transparent' CornerRadius='5' Padding='11,4'><ContentPresenter HorizontalAlignment='Center'/></Border>
     <ControlTemplate.Triggers>
@@ -54,14 +58,16 @@ namespace GifWp
     </ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
   </Style>
   <Style x:Key='Switch' TargetType='CheckBox'>
-   <Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{x:Null}'/><Setter Property='Margin' Value='0,6'/>
+   <Setter Property='Cursor' Value='Hand'/><Setter Property='FocusVisualStyle' Value='{StaticResource Focus}'/><Setter Property='Margin' Value='0,6'/>
    <Setter Property='Template'><Setter.Value><ControlTemplate TargetType='CheckBox'>
     <DockPanel Background='Transparent'>
      <Border x:Name='track' DockPanel.Dock='Right' Width='40' Height='20' CornerRadius='10' BorderThickness='1' BorderBrush='$MUTED' Background='Transparent' Margin='12,0,0,0'>
       <Ellipse x:Name='thumb' Width='12' Height='12' Margin='3,0' HorizontalAlignment='Left' Fill='$MUTED'/></Border>
      <ContentPresenter VerticalAlignment='Center'/>
     </DockPanel>
-    <ControlTemplate.Triggers><Trigger Property='IsChecked' Value='True'>
+    <ControlTemplate.Triggers>
+     <Trigger Property='IsMouseOver' Value='True'><Setter TargetName='track' Property='BorderBrush' Value='$FG'/><Setter TargetName='thumb' Property='Fill' Value='$FG'/></Trigger>
+     <Trigger Property='IsChecked' Value='True'>
      <Setter TargetName='track' Property='Background' Value='$ACCENT'/><Setter TargetName='track' Property='BorderBrush' Value='$ACCENT'/>
      <Setter TargetName='thumb' Property='HorizontalAlignment' Value='Right'/><Setter TargetName='thumb' Property='Fill' Value='$ONACCENT'/>
     </Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
@@ -96,6 +102,15 @@ namespace GifWp
    </StackPanel>
   </DockPanel>
 
+  <!-- Inline notice: questions and problems appear here instead of pop-up dialogs. -->
+  <Border x:Name='Notice' Visibility='Collapsed' Margin='0,12,0,0' Padding='12,8' CornerRadius='8' Background='$CARD' BorderBrush='$LINE' BorderThickness='1'>
+   <DockPanel>
+    <Button x:Name='NoticeDismiss' DockPanel.Dock='Right' Style='{StaticResource Link}' VerticalAlignment='Center' Margin='14,0,2,0'/>
+    <Button x:Name='NoticeAction' DockPanel.Dock='Right' Padding='10,4' VerticalAlignment='Center' Margin='12,0,0,0'/>
+    <TextBlock x:Name='NoticeText' TextWrapping='Wrap' VerticalAlignment='Center'/>
+   </DockPanel>
+  </Border>
+
   <Border Style='{StaticResource Card}'><StackPanel>
    <DockPanel Style='{StaticResource Row}'>
     <Border Style='{StaticResource Segs}'><StackPanel Orientation='Horizontal'>
@@ -116,10 +131,10 @@ namespace GifWp
    </DockPanel>
    <DockPanel Style='{StaticResource Row}'>
     <Border Style='{StaticResource Segs}'><StackPanel Orientation='Horizontal'>
-     <RadioButton x:Name='Fps15' GroupName='fps' Style='{StaticResource Seg}' Content='15'/>
-     <RadioButton x:Name='Fps24' GroupName='fps' Style='{StaticResource Seg}' Content='24'/>
-     <RadioButton x:Name='Fps30' GroupName='fps' Style='{StaticResource Seg}' Content='30'/>
-     <RadioButton x:Name='Fps60' GroupName='fps' Style='{StaticResource Seg}' Content='60'/>
+     <RadioButton x:Name='Fps15' GroupName='fps' Style='{StaticResource Seg}' Content='15' AutomationProperties.Name='15 frames per second'/>
+     <RadioButton x:Name='Fps24' GroupName='fps' Style='{StaticResource Seg}' Content='24' AutomationProperties.Name='24 frames per second'/>
+     <RadioButton x:Name='Fps30' GroupName='fps' Style='{StaticResource Seg}' Content='30' AutomationProperties.Name='30 frames per second'/>
+     <RadioButton x:Name='Fps60' GroupName='fps' Style='{StaticResource Seg}' Content='60' AutomationProperties.Name='60 frames per second'/>
     </StackPanel></Border>
     <TextBlock Style='{StaticResource Label}' Text='Max frame rate'/>
    </DockPanel>
@@ -164,7 +179,10 @@ namespace GifWp
         readonly Border drop;
         readonly TextBlock hint, status, detail;
         readonly Ellipse dot;
-        readonly Button toggle, bgButton;
+        readonly Button toggle, bgButton, choose, noticeAction, noticeDismiss;
+        readonly Border notice;
+        readonly TextBlock noticeText;
+        Action noticeHandler;
         readonly RadioButton[] mon, fit, fps, mem;
         readonly CheckBox cover, battery, autostart;
         readonly DispatcherTimer debounce;
@@ -207,6 +225,11 @@ namespace GifWp
             dot = (Ellipse)Find("Dot");
             toggle = (Button)Find("Toggle");
             bgButton = (Button)Find("Bg");
+            choose = (Button)Find("Choose");
+            notice = (Border)Find("Notice");
+            noticeText = (TextBlock)Find("NoticeText");
+            noticeAction = (Button)Find("NoticeAction");
+            noticeDismiss = (Button)Find("NoticeDismiss");
             mon = Radios("MonPrimary", "MonSpan", "MonEach");
             fit = Radios("FitFill", "FitFit", "FitStretch", "FitCenter");
             fps = Radios("Fps15", "Fps24", "Fps30", "Fps60");
@@ -243,8 +266,13 @@ namespace GifWp
             autostart.Unchecked += delegate { SetAutoStart(false); };
 
             toggle.Click += delegate { if (Program.Engine.Running) Program.Engine.Stop(); else Apply(true); };
-            ((Button)Find("Choose")).Click += delegate { ChooseGif(); };
+            choose.Click += delegate { ChooseGif(); };
             drop.MouseLeftButtonUp += delegate { ChooseGif(); };
+            drop.MouseEnter += delegate { drop.BorderBrush = muted; };   // the preview is clickable: show it
+            drop.MouseLeave += delegate { drop.BorderBrush = line; };
+            noticeAction.Click += delegate { Action a = noticeHandler; HideNotice(); if (a != null) a(); };
+            noticeDismiss.Click += delegate { HideNotice(); };
+            PreviewKeyDown += delegate(object o, KeyEventArgs e) { if (e.Key == Key.Escape) { e.Handled = true; Close(); } };
             bgButton.Click += delegate { PickBackground(); };
             ((Button)Find("Log")).Click += delegate { OpenLog(); };
             ((Button)Find("Remove")).Click += delegate { Remove(); };
@@ -301,20 +329,21 @@ namespace GifWp
         {
             if (!File.Exists(file) || !IsGif(file))
             {
-                MessageBox.Show(this, "Please choose a .gif file.", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowNotice("That file isn't a GIF. Pick a file ending in .gif.", "Choose GIF", ChooseGif, "Dismiss");
                 return;
             }
+            HideNotice();
             Program.Settings.GifPath = file;
             Apply(true);   // choosing a GIF always plays it right away
 
-            // After the very first GIF plays, offer to keep it after a restart (asked once).
+            // After the very first GIF plays, offer to keep it after a restart (asked once, inline).
             if (Program.Engine.Active && !Program.Settings.AskedAutoStart)
             {
                 Program.Settings.AskedAutoStart = true;
                 Program.SaveSettings();
-                if (!AutoStart.IsOn && MessageBox.Show(this, "Your wallpaper is playing!\n\nStart it automatically when you sign in to Windows?",
-                        Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    autostart.IsChecked = true;
+                if (!AutoStart.IsOn)
+                    ShowNotice("Keep this wallpaper after you restart your PC?", "Start with Windows",
+                        delegate { autostart.IsChecked = true; }, "Not now");
             }
         }
 
@@ -336,7 +365,7 @@ namespace GifWp
                 Cursor = Cursors.Wait;
                 try { Program.Engine.Start(s); } finally { Cursor = null; }
                 if (!Program.Engine.Running && Program.Engine.LastError.Length > 0)
-                    MessageBox.Show(this, "The wallpaper could not start:\n\n" + Program.Engine.LastError, Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ShowNotice("This GIF couldn't be played. Try a different file.", "Choose GIF", ChooseGif, "Dismiss");
             }
             UpdateStatus();
         }
@@ -347,7 +376,7 @@ namespace GifWp
             try { AutoStart.Set(on); }
             catch (Exception ex)
             {
-                MessageBox.Show(this, "Could not change the sign-in setting:\n\n" + ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowNotice("Couldn't change Start with Windows: " + ex.Message, null, null, "Dismiss");
                 loading = true; autostart.IsChecked = AutoStart.IsOn; loading = false;
             }
         }
@@ -365,7 +394,23 @@ namespace GifWp
         void OpenLog()
         {
             if (File.Exists(AppPaths.Log)) Process.Start("notepad.exe", "\"" + AppPaths.Log + "\"");
-            else MessageBox.Show(this, "Nothing has gone wrong so far, so there is no log.", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            else ShowNotice("Nothing has gone wrong so far, so there's no log yet.", null, null, "OK");
+        }
+
+        void ShowNotice(string text, string action, Action onAction, string dismiss)
+        {
+            noticeText.Text = text;
+            noticeHandler = onAction;
+            noticeAction.Content = action;
+            noticeAction.Visibility = action == null ? Visibility.Collapsed : Visibility.Visible;
+            noticeDismiss.Content = dismiss;
+            notice.Visibility = Visibility.Visible;
+        }
+
+        void HideNotice()
+        {
+            notice.Visibility = Visibility.Collapsed;
+            noticeHandler = null;
         }
 
         void Remove()
@@ -394,8 +439,8 @@ namespace GifWp
             {
                 dot.Fill = Hex("#2EA043");
                 detail.Text = string.Format("{0} × {1} · {2} frame{3} · {4}", e.Width, e.Height, e.Frames, e.Frames == 1 ? "" : "s",
-                    e.Cached ? "on GPU" : "low-RAM mode");
-                detail.ToolTip = "Playing. " + (e.Cached ? "Every frame is kept ready on the GPU (lowest CPU)." : "Frames are decoded while playing (lowest memory).");
+                    e.Cached ? "less CPU" : "less RAM");
+                detail.ToolTip = "Playing. " + (e.Cached ? "Every frame is kept ready on the GPU, so it uses almost no CPU." : "Frames are decoded while playing, so it uses very little memory.");
             }
             else if (e.Retrying)
             {
@@ -408,6 +453,7 @@ namespace GifWp
                 detail.Text = e.LastError.Length > 0 ? "Couldn't play: " + e.LastError : have ? "Stopped" : "Choose a GIF and it starts playing";
             }
             toggle.Content = e.Running ? "Stop" : "Play";
+            choose.Content = have ? "Change GIF" : "Choose GIF";
             toggle.IsEnabled = e.Running || have;
             ShowPreview(have ? gif : null);
         }

@@ -18,8 +18,8 @@ using Microsoft.Win32;
 [assembly: AssemblyProduct("GIF Live Wallpaper")]
 [assembly: AssemblyDescription("Animated GIF wallpaper behind your desktop icons")]
 [assembly: AssemblyCopyright("MIT License")]
-[assembly: AssemblyVersion("3.1.0.0")]
-[assembly: AssemblyFileVersion("3.1.0.0")]
+[assembly: AssemblyVersion("3.2.0.0")]
+[assembly: AssemblyFileVersion("3.2.0.0")]
 // Opts WPF into current .NET 4.8 behaviour (e.g. per-monitor DPI scaling of the panel).
 [assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.8", FrameworkDisplayName = ".NET Framework 4.8")]
 
@@ -232,7 +232,7 @@ namespace GifWp
 
     public static class Program
     {
-        public const string Version = "3.1.0";
+        public const string Version = "3.2.0";
         const string MutexName = @"Local\GifLiveWallpaper", ShowName = @"Local\GifLiveWallpaper.Show", QuitName = @"Local\GifLiveWallpaper.Quit";
 
         public static Engine Engine;
