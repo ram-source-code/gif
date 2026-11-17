@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity version="3.2.0.0" name="GifLiveWallpaper"/>
+  <assemblyIdentity version="1.0.0.0" name="GifLiveWallpaper"/>
   <!-- Runs as the normal user: never asks for administrator rights. -->
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
