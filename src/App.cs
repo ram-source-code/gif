@@ -20,7 +20,8 @@ using Microsoft.Win32;
 [assembly: AssemblyCopyright("MIT License")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-// Opts WPF into current .NET 4.8 behaviour (e.g. per-monitor DPI scaling of the panel).
+// Targets .NET Framework 4.8, built into every supported Windows (10 21H2+ and 11);
+// also opts WPF into 4.8 behaviour such as per-monitor DPI scaling of the panel.
 [assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.8", FrameworkDisplayName = ".NET Framework 4.8")]
 
 namespace GifWp

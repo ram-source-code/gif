@@ -82,11 +82,11 @@ namespace GifWp
 
         [DllImport("dwmapi.dll")] static extern int DwmSetWindowAttribute(IntPtr h, int attr, ref int value, int size);
 
-        // Dark title bar to match a dark panel (Windows 10 1809+ / 11).
+        // Dark title bar to match a dark panel (Windows 10 21H2+ / 11 support attribute 20).
         public static void DarkTitleBar(IntPtr h, bool dark)
         {
             int v = dark ? 1 : 0;
-            try { if (DwmSetWindowAttribute(h, 20, ref v, 4) != 0) DwmSetWindowAttribute(h, 19, ref v, 4); } catch { }
+            try { DwmSetWindowAttribute(h, 20, ref v, 4); } catch { }
         }
 
         static IntPtr customColors = IntPtr.Zero;
