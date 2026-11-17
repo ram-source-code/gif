@@ -40,7 +40,7 @@ Against heavier wallpaper apps (Wallpaper Engine, Lively and similar), all of th
 - **Capabilities:** plays a GIF in the desktop layer behind icons (primary screen, span, or each monitor); Fill, Fit, Stretch, Center; max frame rate; background colour; Memory: Auto, Less CPU, Less RAM; pause when covered, on lock, and on low battery (unplugged and 20 % or less, or Battery saver); Start with Windows; Remove from this PC.
 - **Must hold for every change:**
   - No network access and no telemetry, ever.
-  - Windows 10 and 11 only, on the built-in .NET Framework 4.x; no extra runtimes to install.
+  - Windows 10 21H2 or newer and Windows 11 only (older versions are not supported), on the .NET Framework 4.8 built into them; no extra runtimes to install.
   - The control panel follows the user's Windows light/dark mode and accent colour, like a built-in Windows tool.
   - Portable: settings are a hidden `GifWinLive.json` next to the exe (or `%APPDATA%\GifWinLive` if that folder is read-only); the only thing written elsewhere is the optional sign-in entry.
 - **Terminology:** "Choose GIF" / "Change GIF", "Play" / "Stop", "Start with Windows", "Remove from this PC", "Less CPU" / "Less RAM".

@@ -2,7 +2,7 @@
 
 **Any animated GIF as your Windows wallpaper, behind your desktop icons, so light you won't notice it's running.**
 
-One small `.exe`. No installer, no admin rights, no internet access. Works on Windows 10 and 11.
+One small `.exe`. No installer, no admin rights, no internet access. Works on Windows 10 (21H2 or newer) and Windows 11.
 
 ![GIF WinLive](screenshot.png)
 
@@ -102,7 +102,7 @@ This produces `GifWinLive.exe` from the files in `src\`:
   with your Windows version.
 - **Remote Desktop / VM without a GPU.** Rendering falls back to the CPU. Choose a lower frame rate.
 
-Requires Windows 10 or 11 with .NET Framework 4.6.2+ (built in).
+Requires Windows 10 21H2 or newer, or Windows 11. It uses the .NET Framework 4.8 that comes with Windows, so there is nothing else to install.
 
 ## License
 
