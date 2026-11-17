@@ -1,4 +1,4 @@
-﻿// GIF Live Wallpaper - the renderer: decodes the GIF and plays it inside the desktop layer.
+﻿// GIF WinLive - the renderer: decodes the GIF and plays it inside the desktop layer.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -266,7 +266,7 @@ namespace GifWp
         Wall CreateWall(Int32Rect r)
         {
             Window win = new Window();
-            win.Title = "GIF Live Wallpaper - desktop";
+            win.Title = "GIF WinLive - desktop";
             win.WindowStyle = WindowStyle.None;
             win.ResizeMode = ResizeMode.NoResize;
             win.ShowInTaskbar = false;

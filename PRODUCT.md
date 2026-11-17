@@ -31,7 +31,7 @@ Against heavier wallpaper apps (Wallpaper Engine, Lively and similar), all of th
 
 ## Operating Context
 
-- Downloaded as `GifWallpaper.exe` from GitHub Releases (ram-source-code/gif), often run straight from Downloads or the Desktop. SmartScreen warns on first launch because the exe is unsigned.
+- Downloaded as `GifWinLive.exe` from GitHub Releases (ram-source-code/gif), often run straight from Downloads or the Desktop. SmartScreen warns on first launch because the exe is unsigned.
 - Opened once to choose a GIF, then lives behind the desktop. Reopening the exe brings the control panel back; closing the panel keeps the wallpaper playing.
 - Optional Start with Windows (`--background` at sign-in). `--stop` ends it.
 
@@ -42,13 +42,13 @@ Against heavier wallpaper apps (Wallpaper Engine, Lively and similar), all of th
   - No network access and no telemetry, ever.
   - Windows 10 and 11 only, on the built-in .NET Framework 4.x; no extra runtimes to install.
   - The control panel follows the user's Windows light/dark mode and accent colour, like a built-in Windows tool.
-  - Portable: settings are a hidden `GifWallpaper.json` next to the exe (or `%APPDATA%\GifWallpaper` if that folder is read-only); the only thing written elsewhere is the optional sign-in entry.
+  - Portable: settings are a hidden `GifWinLive.json` next to the exe (or `%APPDATA%\GifWinLive` if that folder is read-only); the only thing written elsewhere is the optional sign-in entry.
 - **Terminology:** "Choose GIF" / "Change GIF", "Play" / "Stop", "Start with Windows", "Remove from this PC", "Less CPU" / "Less RAM".
 - **Stack (existing):** C# 5 with WPF and GDI+, compiled by `build.cmd`; sources in `src/`.
 
 ## Brand Commitments
 
-- Name: **GIF Live Wallpaper**.
+- Name: **GIF WinLive** (exe: `GifWinLive.exe`). Renamed from "GIF Live Wallpaper" before anyone saw it; the app migrates settings and the sign-in entry from the old name.
 - Icon: `src/app.ico`, supplied by the owner. It replaced a generated icon the owner rejected as looking AI-made, so do not substitute generated artwork or palettes for the owner's assets.
 
 ## Evidence on Hand

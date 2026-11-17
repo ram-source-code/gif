@@ -1,4 +1,4 @@
-﻿// GIF Live Wallpaper - Win32 helpers and desktop-layer discovery.
+﻿// GIF WinLive - Win32 helpers and desktop-layer discovery.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

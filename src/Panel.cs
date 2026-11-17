@@ -1,4 +1,4 @@
-﻿// GIF Live Wallpaper - the control panel. Follows the Windows light/dark theme and accent
+﻿// GIF WinLive - the control panel. Follows the Windows light/dark theme and accent
 // colour. Its styles are parsed only while the window is open; closing it frees everything.
 using System;
 using System.Diagnostics;
@@ -207,7 +207,7 @@ namespace GifWp
                 .Replace("$ACCENT", acc).Replace("$ONACCENT", lightAccent ? "#000000" : "#FFFFFF");
             root = (FrameworkElement)XamlReader.Parse(xaml);
 
-            Title = "GIF Live Wallpaper";
+            Title = "GIF WinLive";
             Width = 480;
             SizeToContent = SizeToContent.Height;
             ResizeMode = ResizeMode.CanMinimize;
@@ -416,11 +416,11 @@ namespace GifWp
         void Remove()
         {
             if (MessageBox.Show(this,
-                    "Remove GIF Live Wallpaper from this PC?\n\n" +
+                    "Remove GIF WinLive from this PC?\n\n" +
                     "  • stops the wallpaper\n" +
                     "  • removes the Start with Windows entry\n" +
                     "  • deletes its hidden settings file\n\n" +
-                    "Afterwards you can simply delete GifWallpaper.exe.",
+                    "Afterwards you can simply delete " + System.IO.Path.GetFileName(AppPaths.Exe) + ".",
                     Title, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             removed = true;
             debounce.Stop();

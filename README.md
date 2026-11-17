@@ -1,18 +1,18 @@
-# GIF Live Wallpaper
+# GIF WinLive
 
 **Any animated GIF as your Windows wallpaper, behind your desktop icons, so light you won't notice it's running.**
 
 One small `.exe`. No installer, no admin rights, no internet access. Works on Windows 10 and 11.
 
-![GIF Live Wallpaper](screenshot.png)
+![GIF WinLive](screenshot.png)
 
 ## Use it
 
-1. Download **`GifWallpaper.exe`** from [Releases](../../releases) and put it anywhere (Desktop, Documents, a USB stick…).
+1. Download **`GifWinLive.exe`** from [Releases](../../releases) and put it anywhere (Desktop, Documents, a USB stick…).
 2. Double-click it and **pick a GIF**. It starts playing behind your icons right away.
 3. Say **Yes** if you want it back after a restart.
 
-To change anything later, just open `GifWallpaper.exe` again. Closing the window keeps the wallpaper playing.
+To change anything later, just open `GifWinLive.exe` again. Closing the window keeps the wallpaper playing.
 
 > **"Windows protected your PC"?** SmartScreen shows this for any new app that isn't signed by
 > a big publisher. Click **More info → Run anyway**, or build it yourself from source (below).
@@ -53,8 +53,8 @@ and only writes a log file if something goes wrong.
 
 | What | Where |
 |---|---|
-| Settings | `GifWallpaper.json`, a hidden file next to the exe (or `%APPDATA%\GifWallpaper` if that folder is read-only) |
-| Problem log | `GifWallpaper.log`, hidden, created only if something goes wrong |
+| Settings | `GifWinLive.json`, a hidden file next to the exe (or `%APPDATA%\GifWinLive` if that folder is read-only) |
+| Problem log | `GifWinLive.log`, hidden, created only if something goes wrong |
 | Start with Windows | one value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, only if you turn it on |
 
 **Remove from this PC** (bottom of the panel) deletes all of that. Then delete the exe and it's gone.
@@ -62,9 +62,9 @@ and only writes a log file if something goes wrong.
 ## Command line
 
 ```
-GifWallpaper.exe               open the panel (and play the saved GIF)
-GifWallpaper.exe --background  play without the panel (used at sign-in)
-GifWallpaper.exe --stop        stop it
+GifWinLive.exe               open the panel (and play the saved GIF)
+GifWinLive.exe --background  play without the panel (used at sign-in)
+GifWinLive.exe --stop        stop it
 ```
 
 ## Build it yourself
@@ -75,7 +75,7 @@ No Visual Studio or SDK needed. Windows already includes the C# compiler.
 build.cmd
 ```
 
-This produces `GifWallpaper.exe` from the files in `src\`:
+This produces `GifWinLive.exe` from the files in `src\`:
 
 | File | |
 |---|---|

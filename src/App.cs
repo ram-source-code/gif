@@ -1,8 +1,8 @@
-﻿// GIF Live Wallpaper - entry point, settings, single instance and sign-in entry.
+﻿// GIF WinLive - entry point, settings, single instance and sign-in entry.
 //
-//   GifWallpaper.exe              open the control panel (and play the saved GIF)
-//   GifWallpaper.exe --background play the saved GIF without the panel (used at sign-in)
-//   GifWallpaper.exe --stop       stop a running copy
+//   GifWinLive.exe              open the control panel (and play the saved GIF)
+//   GifWinLive.exe --background play the saved GIF without the panel (used at sign-in)
+//   GifWinLive.exe --stop       stop a running copy
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,8 +14,8 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
 
-[assembly: AssemblyTitle("GIF Live Wallpaper")]
-[assembly: AssemblyProduct("GIF Live Wallpaper")]
+[assembly: AssemblyTitle("GIF WinLive")]
+[assembly: AssemblyProduct("GIF WinLive")]
 [assembly: AssemblyDescription("Animated GIF wallpaper behind your desktop icons")]
 [assembly: AssemblyCopyright("MIT License")]
 [assembly: AssemblyVersion("1.0.0.0")]
@@ -161,7 +161,7 @@ namespace GifWp
     }
 
     // Portable: settings live next to the exe. Only if that folder is read-only
-    // (e.g. Program Files) does it fall back to %APPDATA%\GifWallpaper.
+    // (e.g. Program Files) does it fall back to %APPDATA%\GifWinLive.
     public static class AppPaths
     {
         public static string Exe, ExeDir, DataDir, Config, Log;
@@ -170,14 +170,37 @@ namespace GifWp
         {
             Exe = Assembly.GetEntryAssembly().Location;
             ExeDir = Path.GetDirectoryName(Exe);
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            Rename(ExeDir);                                          // before the app was called GIF WinLive
+            Rename(Path.Combine(appData, "GifWallpaper"), Path.Combine(appData, "GifWinLive"));
             DataDir = ExeDir;
-            if (!File.Exists(Path.Combine(ExeDir, "GifWallpaper.json")) && !CanWrite(ExeDir))
+            if (!File.Exists(Path.Combine(ExeDir, "GifWinLive.json")) && !CanWrite(ExeDir))
             {
-                DataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GifWallpaper");
+                DataDir = Path.Combine(appData, "GifWinLive");
                 Directory.CreateDirectory(DataDir);
             }
-            Config = Path.Combine(DataDir, "GifWallpaper.json");
-            Log = Path.Combine(DataDir, "GifWallpaper.log");
+            Config = Path.Combine(DataDir, "GifWinLive.json");
+            Log = Path.Combine(DataDir, "GifWinLive.log");
+        }
+
+        // Carries settings and log over from the old "GifWallpaper" names, once.
+        static void Rename(string oldDir, string newDir = null)
+        {
+            try
+            {
+                if (newDir != null)
+                {
+                    if (!Directory.Exists(oldDir) || Directory.Exists(newDir)) return;
+                    Directory.Move(oldDir, newDir);
+                    oldDir = newDir;
+                }
+                foreach (string ext in new[] { ".json", ".log" })
+                {
+                    string from = Path.Combine(oldDir, "GifWallpaper" + ext), to = Path.Combine(oldDir, "GifWinLive" + ext);
+                    if (File.Exists(from) && !File.Exists(to)) File.Move(from, to);
+                }
+            }
+            catch { }
         }
 
         static bool CanWrite(string dir)
@@ -196,7 +219,7 @@ namespace GifWp
     // The only thing the app ever writes outside its own folder (and only if you ask).
     public static class AutoStart
     {
-        const string Key = @"Software\Microsoft\Windows\CurrentVersion\Run", Name = "GifWallpaper";
+        const string Key = @"Software\Microsoft\Windows\CurrentVersion\Run", Name = "GifWinLive", OldName = "GifWallpaper";
 
         static string Command { get { return "\"" + AppPaths.Exe + "\" --background"; } }
 
@@ -221,19 +244,39 @@ namespace GifWp
         // the entry, point it here. Another working copy elsewhere is left alone.
         public static void Sync()
         {
+            // An entry from before the rename: take it over if it belonged to this copy
+            // (same folder), to an older script-based version, or to an exe that is gone.
+            using (RegistryKey k = Registry.CurrentUser.OpenSubKey(Key, true))
+            {
+                string old = k == null ? null : k.GetValue(OldName) as string;
+                if (old != null && (Legacy(old) || !File.Exists(Target(old)) ||
+                    string.Equals(Path.GetDirectoryName(Target(old)), AppPaths.ExeDir, StringComparison.OrdinalIgnoreCase)))
+                {
+                    k.DeleteValue(OldName, false);
+                    if (Current() == null) Set(true);
+                }
+            }
             string cur = Current();
             if (cur == null || cur == Command) return;
-            bool legacy = cur.IndexOf("GifWallpaper.ps1", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                          cur.IndexOf(@"\bin\GifWallpaper.exe", StringComparison.OrdinalIgnoreCase) >= 0;
-            string target = cur.StartsWith("\"") && cur.IndexOf('"', 1) > 0 ? cur.Substring(1, cur.IndexOf('"', 1) - 1) : cur;
-            if (legacy || !File.Exists(target)) Set(true);
+            if (Legacy(cur) || !File.Exists(Target(cur))) Set(true);
+        }
+
+        static bool Legacy(string cmd)
+        {
+            return cmd.IndexOf("GifWallpaper.ps1", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   cmd.IndexOf(@"\bin\GifWallpaper.exe", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        static string Target(string cmd)
+        {
+            return cmd.StartsWith("\"") && cmd.IndexOf('"', 1) > 0 ? cmd.Substring(1, cmd.IndexOf('"', 1) - 1) : cmd;
         }
     }
 
     public static class Program
     {
         public const string Version = "1.0.0";
-        const string MutexName = @"Local\GifLiveWallpaper", ShowName = @"Local\GifLiveWallpaper.Show", QuitName = @"Local\GifLiveWallpaper.Quit";
+        const string MutexName = @"Local\GifWinLive", ShowName = @"Local\GifWinLive.Show", QuitName = @"Local\GifWinLive.Quit";
 
         public static Engine Engine;
         public static Settings Settings;
@@ -259,7 +302,7 @@ namespace GifWp
                 catch (Exception ex)
                 {
                     try { Log("FATAL: " + ex); } catch { }
-                    MessageBox.Show("GIF Live Wallpaper ran into a problem:\n\n" + ex.Message, "GIF Live Wallpaper", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("GIF WinLive ran into a problem:\n\n" + ex.Message, "GIF WinLive", MessageBoxButton.OK, MessageBoxImage.Error);
                     return 1;
                 }
                 finally { try { mutex.ReleaseMutex(); } catch { } }
@@ -268,7 +311,10 @@ namespace GifWp
 
         static int Run(bool background)
         {
-            Signal(@"Local\GifWallpaper.Stop");   // stop an older (PowerShell-based) version if it is running
+            // Stop older versions (script-based, or the exe before the rename) so two wallpapers never overlap.
+            Signal(@"Local\GifWallpaper.Stop");
+            Signal(@"Local\GifLiveWallpaper.Quit");
+            for (int i = 0; i < 30 && Exists(@"Local\GifLiveWallpaper"); i++) Thread.Sleep(100);
             AppPaths.Init();
             Settings = Settings.Load(AppPaths.Config);
             if (Settings.LowPriority) Native.SetLowPower();
@@ -293,12 +339,18 @@ namespace GifWp
 
             app.Dispatcher.BeginInvoke(new Action(delegate
             {
+                try { AutoStart.Sync(); } catch { }
                 if (haveGif) Engine.Start(Settings);
-                if (!background) { try { AutoStart.Sync(); } catch { } ShowPanel(); }
+                if (!background) ShowPanel();
                 ExitIfIdle();
             }));
             app.Run();
             return 0;
+        }
+
+        static bool Exists(string mutexName)
+        {
+            try { using (Mutex m = Mutex.OpenExisting(mutexName)) return true; } catch { return false; }
         }
 
         static void Signal(string name)
