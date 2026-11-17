@@ -1,0 +1,12 @@
+# Build output (attach GifWallpaper.exe to a GitHub Release instead of committing it)
+GifWallpaper.exe
+
+# Created next to the exe when it runs
+GifWallpaper.json
+GifWallpaper.log
+
+# local publishing scratch
+_publish/
+
+# sample GIFs stay local (not ours to redistribute)
+gifs/

@@ -1,0 +1,8 @@
+# Windows sources keep CRLF line endings, so build.cmd works after a clone or "Download ZIP".
+*.cs       text eol=crlf
+*.cmd      text eol=crlf
+*.manifest text eol=crlf
+*.md       text
+*.ico      binary
+*.gif      binary
+*.png      binary
