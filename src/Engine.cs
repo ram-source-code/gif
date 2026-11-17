@@ -437,7 +437,16 @@ namespace GifWp
                 if (any && !frameTimer.IsEnabled) frameTimer.Start();
                 else if (!any && frameTimer.IsEnabled) frameTimer.Stop();
             }
+
+            // Fully paused for 30 s (game, video, locked PC, low battery): hand the
+            // working set back to Windows once. Pages return on demand when it resumes.
+            if (any) { pausedSince = -1; trimmedThisPause = false; }
+            else if (pausedSince < 0) pausedSince = tick;
+            else if (!trimmedThisPause && tick - pausedSince >= 60) { trimmedThisPause = true; Native.Trim(); }
         }
+
+        int pausedSince = -1;
+        bool trimmedThisPause;
 
         IntPtr lastFg;
         bool lastFgIsShell;
