@@ -21,6 +21,17 @@ namespace GifWp
         public IntPtr lpCustColors; public int Flags; public IntPtr lCustData; public IntPtr lpfnHook; public IntPtr lpTemplateName;
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct OPENFILENAME
+    {
+        public int lStructSize; public IntPtr hwndOwner; public IntPtr hInstance;
+        public string lpstrFilter; public string lpstrCustomFilter; public int nMaxCustFilter; public int nFilterIndex;
+        public IntPtr lpstrFile; public int nMaxFile; public string lpstrFileTitle; public int nMaxFileTitle;
+        public string lpstrInitialDir; public string lpstrTitle; public int Flags; public short nFileOffset; public short nFileExtension;
+        public string lpstrDefExt; public IntPtr lCustData; public IntPtr lpfnHook; public string lpTemplateName;
+        public IntPtr pvReserved; public int dwReserved; public int FlagsEx;
+    }
+
     public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     public delegate bool MonitorEnumProc(IntPtr hMon, IntPtr hdc, ref RECT rc, IntPtr data);
 
@@ -52,6 +63,36 @@ namespace GifWp
         [DllImport("kernel32.dll")] public static extern IntPtr GetCurrentProcess();
         [DllImport("kernel32.dll")] public static extern bool SetProcessWorkingSetSize(IntPtr p, IntPtr min, IntPtr max);
         [DllImport("comdlg32.dll")] public static extern bool ChooseColor(ref CHOOSECOLOR cc);
+        [DllImport("comdlg32.dll", CharSet = CharSet.Unicode)] static extern bool GetOpenFileName(ref OPENFILENAME ofn);
+        [DllImport("user32.dll")] public static extern bool EnableWindow(IntPtr h, bool enable);
+
+        // The standard Windows "Open" dialog, owned by a window that may live in another
+        // process. Returns the chosen path, or null if cancelled.
+        public static string PickGif(IntPtr owner, string initialDir, string fileName, string title)
+        {
+            const int Max = 4096;
+            IntPtr buf = Marshal.AllocHGlobal(Max * 2);
+            try
+            {
+                byte[] zero = new byte[Max * 2];
+                Marshal.Copy(zero, 0, buf, zero.Length);
+                if (!string.IsNullOrEmpty(fileName) && fileName.Length < Max - 1)
+                    Marshal.Copy(fileName.ToCharArray(), 0, buf, fileName.Length);
+                OPENFILENAME o = new OPENFILENAME();
+                o.lStructSize = Marshal.SizeOf(typeof(OPENFILENAME));
+                o.hwndOwner = owner;
+                o.lpstrFilter = "GIF images (*.gif)\0*.gif\0\0";
+                o.nFilterIndex = 1;
+                o.lpstrFile = buf;
+                o.nMaxFile = Max;
+                o.lpstrInitialDir = initialDir;
+                o.lpstrTitle = title;
+                o.lpstrDefExt = "gif";
+                o.Flags = 0x1000 | 0x800 | 0x80000 | 0x8 | 0x4;   // FILEMUSTEXIST | PATHMUSTEXIST | EXPLORER | NOCHANGEDIR | HIDEREADONLY
+                return GetOpenFileName(ref o) ? Marshal.PtrToStringUni(buf) : null;
+            }
+            finally { Marshal.FreeHGlobal(buf); }
+        }
 
         public static void SetLowPower()
         {

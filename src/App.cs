@@ -3,6 +3,7 @@
 //   GifWinLive.exe              open the control panel (and play the saved GIF)
 //   GifWinLive.exe --background play the saved GIF without the panel (used at sign-in)
 //   GifWinLive.exe --stop       stop a running copy
+//   GifWinLive.exe --pick <hwnd> internal: shows the file picker in a throwaway process
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -288,6 +289,7 @@ namespace GifWp
         public static int Main(string[] args)
         {
             string mode = args.Length > 0 ? args[0].ToLowerInvariant() : "";
+            if (mode == "--pick") return Pick(args);
             bool created;
             using (Mutex mutex = new Mutex(true, MutexName, out created))
             {
@@ -308,6 +310,22 @@ namespace GifWp
                 }
                 finally { try { mutex.ReleaseMutex(); } catch { } }
             }
+        }
+
+        // Helper mode: shows the file picker in this short-lived process and prints the choice.
+        // Windows loads Explorer's shell extensions and builds thumbnails (hundreds of MB for a
+        // folder of GIFs) into whichever process shows the dialog; this way they die with it.
+        static int Pick(string[] args)
+        {
+            long owner = 0;
+            if (args.Length > 1) long.TryParse(args[1], out owner);
+            string path = Native.PickGif(new IntPtr(owner), Environment.GetEnvironmentVariable("GIFWINLIVE_PICK_DIR"),
+                Environment.GetEnvironmentVariable("GIFWINLIVE_PICK_FILE"), "Choose a GIF for your wallpaper");
+            if (path == null) return 1;
+            // Raw UTF-8 bytes: a windowless exe has no console, so Console encodings can't be set.
+            byte[] b = new UTF8Encoding(false).GetBytes(path);
+            using (Stream o = Console.OpenStandardOutput()) o.Write(b, 0, b.Length);
+            return 0;
         }
 
         static int Run(bool background)

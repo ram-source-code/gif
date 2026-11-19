@@ -299,7 +299,11 @@ namespace GifWp
             {
                 if (!File.Exists(Program.Settings.GifPath)) Dispatcher.BeginInvoke(new Action(ChooseGif));   // first run
             };
-            Closed += delegate { if (debounce.IsEnabled && !removed) { debounce.Stop(); Apply(false); } };
+            Closed += delegate
+            {
+                if (debounce.IsEnabled && !removed) { debounce.Stop(); Apply(false); }
+                if (picker != null) { try { picker.Kill(); } catch { } }   // don't leave an orphan picker behind
+            };
 
             UpdateStatus();
             loading = false;
@@ -314,14 +318,53 @@ namespace GifWp
             debounce.Start();
         }
 
+        Process picker;
+
+        // The picker runs in a throwaway copy of this exe (--pick): Windows loads shell
+        // extensions and GIF thumbnails into whichever process shows the dialog, and that
+        // memory would otherwise stay in the wallpaper process until it restarts.
         void ChooseGif()
         {
-            OpenFileDialog dlg = new OpenFileDialog { Title = "Choose a GIF for your wallpaper", Filter = "GIF images (*.gif)|*.gif" };
+            if (picker != null) return;
             string cur = Program.Settings.GifPath;
             string samples = System.IO.Path.Combine(AppPaths.ExeDir, "gifs");
-            if (File.Exists(cur)) { dlg.InitialDirectory = System.IO.Path.GetDirectoryName(cur); dlg.FileName = System.IO.Path.GetFileName(cur); }
-            else if (Directory.Exists(samples)) dlg.InitialDirectory = samples;
-            else dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string dir, name = "";
+            if (File.Exists(cur)) { dir = System.IO.Path.GetDirectoryName(cur); name = System.IO.Path.GetFileName(cur); }
+            else if (Directory.Exists(samples)) dir = samples;
+            else dir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            ProcessStartInfo psi = new ProcessStartInfo(AppPaths.Exe, "--pick " + hwnd.ToInt64());
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+            psi.RedirectStandardOutput = true;
+            psi.StandardOutputEncoding = new System.Text.UTF8Encoding(false);
+            psi.EnvironmentVariables["GIFWINLIVE_PICK_DIR"] = dir;
+            psi.EnvironmentVariables["GIFWINLIVE_PICK_FILE"] = name;
+            Process p;
+            try { p = Process.Start(psi); }
+            catch { ChooseGifHere(dir, name); return; }
+            picker = p;
+            p.EnableRaisingEvents = true;
+            p.Exited += delegate
+            {
+                string path = "";
+                try { path = p.StandardOutput.ReadToEnd().Trim(); } catch { }
+                Dispatcher.BeginInvoke(new Action(delegate
+                {
+                    picker = null;
+                    p.Dispose();
+                    Native.EnableWindow(hwnd, true);   // in case the helper ended without re-enabling us
+                    Activate();
+                    if (path.Length > 0) SetGif(path);
+                }));
+            };
+        }
+
+        // Fallback if the helper cannot start: the same dialog inside this process.
+        void ChooseGifHere(string dir, string name)
+        {
+            OpenFileDialog dlg = new OpenFileDialog { Title = "Choose a GIF for your wallpaper", Filter = "GIF images (*.gif)|*.gif", InitialDirectory = dir, FileName = name };
             if (dlg.ShowDialog(this) == true) SetGif(dlg.FileName);
         }
 
